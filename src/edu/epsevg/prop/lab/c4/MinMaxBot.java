@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package edu.epsevg.prop.lab.c4;
+import java.lang.Math;
 /**
  * Clase MinMaxBot que implementa un jugador automático utilizando el algoritmo Minimax 
  * con poda alfa-beta y una heurística personalizada para evaluar las posiciones en el tablero.
@@ -13,6 +14,7 @@ public class MinMaxBot implements IAuto, Jugador {
 
     private Heuristica heuristica; // Instancia de la clase Heuristica para evaluar posiciones en el tablero
     private int maxDepth; // Profundidad máxima de la búsqueda Minimax
+    private int colSize;
 
     /**
      * Constructor de MinMaxBot.
@@ -21,6 +23,7 @@ public class MinMaxBot implements IAuto, Jugador {
      * @param depth Profundidad máxima de la búsqueda Minimax.
      */
     public MinMaxBot(int size, int depth) {
+        this.colSize = size;
         this.setMaxDepth(depth); // Establece la profundidad máxima
         heuristica = new Heuristica(size); // Inicializa la heurística con el tamaño del tablero
     }
@@ -44,7 +47,7 @@ public class MinMaxBot implements IAuto, Jugador {
     @Override
     public int moviment(Tauler t, int color) {
         // Llama a minimax para determinar el mejor movimiento
-        int bestMove = minimax(t, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true, color)[0];
+        int bestMove = minimax(convertToBoardArray(t), maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true, color)[0];
         return bestMove; // Devuelve la mejor columna
     }
 
@@ -69,10 +72,21 @@ public class MinMaxBot implements IAuto, Jugador {
      * @param color Color del jugador actual.
      * @return Arreglo con la columna óptima y la puntuación asociada.
      */
-    private int[] minimax(Tauler t, int depth, int alpha, int beta, boolean maximizingPlayer, int color) {
+    private int[] minimax(int[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, int color) {
         // Caso base: si se alcanza la profundidad máxima o no hay movimientos posibles
-        if (depth == 0 || t.espotmoure() == false) {
-            int score = heuristica.scorePosition(convertToBoardArray(t), color); // Evalúa el tablero
+        boolean finished = heuristica.finished(board);
+        if (depth == 0 || finished) {
+            if (finished) {
+                if (heuristica.winningMove(board, heuristica.PLAYER_PIECE)) {
+                    return new int[] { -1 , Integer.MIN_VALUE };
+                }
+                else if (heuristica.winningMove(board, heuristica.BOT_PIECE)) {
+                    return new int[] { -1 , Integer.MAX_VALUE };
+                }
+                else return new int[] { -1, 0 };
+            }
+            int score = heuristica.scorePosition(board, heuristica.BOT_PIECE); // Evalúa el tablero
+            // System.out.printf("Got score with depth 0: %d\n", score);
             return new int[] { -1, score }; // Devuelve la puntuación sin movimiento
         }
 
@@ -80,16 +94,20 @@ public class MinMaxBot implements IAuto, Jugador {
         int bestScore = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE; // Inicializa la mejor puntuación
 
         // Itera por todas las columnas posibles
-        for (int col = 0; col < t.getMida(); col++) {
-            if (t.movpossible(col)) { // Verifica si el movimiento en la columna es válido
-                Tauler tCopy = new Tauler(t); // Crea una copia del tablero
-                tCopy.afegeix(col, color); // Simula el movimiento en la copia
-
+        for (int col = 0; col < colSize; col++) {
+            if (heuristica.validLocation(board, col)) { // Verifica si el movimiento en la columna es válido
+                
+                int[][] boardCopy = new int[colSize][colSize]; // Crea una copia del tablero
+                for (int i = 0; i < colSize; ++i){
+                    System.arraycopy(board, 0, boardCopy, 0, colSize);
+                }
+                heuristica.play(boardCopy, col, color); // Simula una jugada
+                
                 int nextPlayerColor = (color == 1) ? 2 : 1; // Alterna el jugador
 
                 // Llama recursivamente a minimax
-                int score = minimax(tCopy, depth - 1, alpha, beta, !maximizingPlayer, nextPlayerColor)[1];
-
+                int score = minimax(board, depth - 1, alpha, beta, !maximizingPlayer, nextPlayerColor)[1];
+                
                 // Actualiza la mejor puntuación y columna para el jugador maximizador
                 if (maximizingPlayer) {
                     if (score > bestScore) {
@@ -97,7 +115,7 @@ public class MinMaxBot implements IAuto, Jugador {
                         bestColumn = col;
                     }
                     alpha = Math.max(alpha, bestScore); // Actualiza alfa
-                } 
+                }
                 // Actualiza la mejor puntuación y columna para el jugador minimizador
                 else {
                     if (score < bestScore) {
@@ -113,6 +131,7 @@ public class MinMaxBot implements IAuto, Jugador {
                 }
             }
         }
+        // System.out.printf("bestScore: %d\n", bestScore);
 
         return new int[] { bestColumn, bestScore }; // Devuelve la mejor columna y puntuación
     }

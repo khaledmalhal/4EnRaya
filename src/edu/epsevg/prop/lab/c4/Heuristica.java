@@ -1,5 +1,7 @@
 package edu.epsevg.prop.lab.c4;
 
+import java.util.ArrayList;
+
 /**
  * Clase Heuristica que implementa métodos para evaluar posiciones en un tablero de juego
  * y determinar jugadas óptimas basadas en una puntuación heurística.
@@ -9,10 +11,10 @@ public class Heuristica {
     // Variables estáticas para definir dimensiones y constantes del tablero
     private static int ROW_COUNT; // Número de filas del tablero
     private static int COLUMN_COUNT; // Número de columnas del tablero
-    private static final int WINDOW_LENGTH = 4; // Longitud de la ventana (4 fichas en línea)
-    private static final int PLAYER_PIECE = 1; // Representación del jugador
-    private static final int BOT_PIECE = 2; // Representación del bot
-    private static final int EMPTY = 0; // Representación de un espacio vacío
+    final int WINDOW_LENGTH = 4; // Longitud de la ventana (4 fichas en línea)
+    final int PLAYER_PIECE = 1; // Representación del jugador
+    final int BOT_PIECE = 2; // Representación del bot
+    final int EMPTY = 0; // Representación de un espacio vacío
 
     /**
      * Constructor de la clase Heuristica.
@@ -44,13 +46,38 @@ public class Heuristica {
     }
 
     /**
+     * Consulta en la tabla si es posible jugar en una cierta columna.
+     * @param board La tabla del juego.
+     * @param col La columna a consultar.
+     * @return Retorna true si es puede jugar en la columna consultada, false si no es posible jugar.
+     */
+    public boolean validLocation(int[][] board, int col) {
+        return board[ROW_COUNT - 1][col] == EMPTY;
+    }
+
+    /**
+     * Retorna las columnas donde se puede jugar en una tabla.
+     * @param board La tabla a consultar.
+     * @return Retorna un {@link ArrayList} de todas las columnas donde se puede jugar.
+     */
+    public ArrayList<Integer> getValidPlays(int[][] board) {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (int col = 0; col < COLUMN_COUNT; ++col) {
+            if (validLocation(board, col)) {
+                ret.add(col);
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Calcula la puntuación de una posición en el tablero en función de una heurística.
      *
      * @param board Matriz bidimensional que representa el tablero.
      * @param piece Pieza del jugador actual (1 para jugador, 2 para bot).
      * @return Puntuación calculada para el tablero.
      */
-    public static int scorePosition(int[][] board, int piece) {
+    public int scorePosition(int[][] board, int piece) {
         int score = 0; // Inicializa la puntuación
 
         // Evalúa la columna central del tablero
@@ -116,7 +143,7 @@ public class Heuristica {
      * @param piece Pieza del jugador actual (1 para jugador, 2 para bot).
      * @return Puntuación de la ventana.
      */
-    private static int evaluateWindow(int[] window, int piece) {
+    private int evaluateWindow(int[] window, int piece) {
         int score = 0; // Inicializa la puntuación para la ventana
         int oppPiece = (piece == PLAYER_PIECE) ? BOT_PIECE : PLAYER_PIECE; // Define la pieza del oponente
 
@@ -147,7 +174,7 @@ public class Heuristica {
      * @param piece Pieza del jugador actual (1 para jugador, 2 para bot).
      * @return true si el jugador tiene una jugada ganadora, de lo contrario false.
      */
-    public static boolean winningMove(int[][] board, int piece) {
+    public boolean winningMove(int[][] board, int piece) {
         // Verifica filas para jugadas ganadoras
         for (int c = 0; c < COLUMN_COUNT - 3; c++) {
             for (int r = 0; r < ROW_COUNT; r++) {
@@ -191,6 +218,16 @@ public class Heuristica {
         return false; // Devuelve falso si no hay jugadas ganadoras
     }
 
+    public void play(int[][] board, int col, int color) {
+        if (!validLocation(board, col))
+            return;
+        int row = 0;
+        while (board[row][col] != 0 && row < ROW_COUNT)
+            ++row;
+        if (row < ROW_COUNT)
+            board[row][col] = color;
+    }
+
     /**
      * Cuenta cuántas veces aparece un valor en una ventana.
      *
@@ -204,5 +241,19 @@ public class Heuristica {
             if (i == value) count++;
         }
         return count; // Devuelve la cantidad de coincidencias
+    }
+    
+    /**
+     * Consulta en la tabla si hay alguna jugada posible.
+     *
+     * Toma en cuenta si alguno de los jugadores ha ganado o si la tabla está llena.
+     * @param board La tabla a consultar.
+     * @return Retorna true si alguno de los jugadores ha ganado o si la tabla está llena, en caso contrario, retorna false.
+     */
+    public boolean finished(int[][] board) {
+        boolean playerWin = winningMove(board, PLAYER_PIECE);
+        boolean botWin = winningMove(board, BOT_PIECE);
+        ArrayList<Integer> possibleCol = getValidPlays(board);
+        return playerWin || botWin || possibleCol.isEmpty();
     }
 }
