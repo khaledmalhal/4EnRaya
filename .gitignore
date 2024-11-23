@@ -25,3 +25,6 @@ replay_pid*
 /nbproject/private/
 /build/
 /dist/
+
+# Visual Studio Code
+.vscode/

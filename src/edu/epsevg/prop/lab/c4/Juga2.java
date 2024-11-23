@@ -95,7 +95,7 @@ public class Juga2 extends javax.swing.JFrame {
         //</editor-fold>
 
         // Definiu al vostre gust els jugadors a enfrontar.
-        Jugador p1 = new MinMaxBot(8,16);
+        Jugador p1 = new MinMaxBot(8,8);
         //Jugador p1 = new Aleatori();
 
         Jugador p2 = new Profe(2,false);

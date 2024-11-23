@@ -218,6 +218,12 @@ public class Heuristica {
         return false; // Devuelve falso si no hay jugadas ganadoras
     }
 
+    /**
+     * Simula una jugada en una tabla de un jugador en la primera fila posible de una columna en específico.
+     * @param board La tabla a jugar.
+     * @param col La columna a jugar.
+     * @param color El color del jugador.
+     */
     public void play(int[][] board, int col, int color) {
         if (!validLocation(board, col))
             return;
@@ -226,6 +232,7 @@ public class Heuristica {
             ++row;
         if (row < ROW_COUNT)
             board[row][col] = color;
+        System.out.printf("Playing in board[%d][%d]\n", row, col);
     }
 
     /**

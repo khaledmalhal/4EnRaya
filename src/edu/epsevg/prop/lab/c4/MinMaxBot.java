@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package edu.epsevg.prop.lab.c4;
-import java.lang.Math;
+
 /**
  * Clase MinMaxBot que implementa un jugador automático utilizando el algoritmo Minimax 
  * con poda alfa-beta y una heurística personalizada para evaluar las posiciones en el tablero.
@@ -14,7 +14,7 @@ public class MinMaxBot implements IAuto, Jugador {
 
     private Heuristica heuristica; // Instancia de la clase Heuristica para evaluar posiciones en el tablero
     private int maxDepth; // Profundidad máxima de la búsqueda Minimax
-    private int colSize;
+    private int COLUMN_SIZE;  // Tamaño de la columna de la tabla
 
     /**
      * Constructor de MinMaxBot.
@@ -23,7 +23,7 @@ public class MinMaxBot implements IAuto, Jugador {
      * @param depth Profundidad máxima de la búsqueda Minimax.
      */
     public MinMaxBot(int size, int depth) {
-        this.colSize = size;
+        this.COLUMN_SIZE = size;
         this.setMaxDepth(depth); // Establece la profundidad máxima
         heuristica = new Heuristica(size); // Inicializa la heurística con el tamaño del tablero
     }
@@ -94,19 +94,29 @@ public class MinMaxBot implements IAuto, Jugador {
         int bestScore = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE; // Inicializa la mejor puntuación
 
         // Itera por todas las columnas posibles
-        for (int col = 0; col < colSize; col++) {
+        for (int col = 0; col < COLUMN_SIZE; col++) {
             if (heuristica.validLocation(board, col)) { // Verifica si el movimiento en la columna es válido
                 
-                int[][] boardCopy = new int[colSize][colSize]; // Crea una copia del tablero
-                for (int i = 0; i < colSize; ++i){
-                    System.arraycopy(board, 0, boardCopy, 0, colSize);
+                int[][] boardCopy = new int[COLUMN_SIZE][COLUMN_SIZE]; // Crea una copia del tablero
+                for (int i = 0; i < COLUMN_SIZE; ++i){
+                    System.arraycopy(board[i], 0, boardCopy[i], 0, COLUMN_SIZE);
                 }
-                heuristica.play(boardCopy, col, color); // Simula una jugada
+
+                int bestCol = ((COLUMN_SIZE - col) / 2) - 1;
+                while (!heuristica.validLocation(boardCopy, bestCol) && bestCol != 0) {
+                    bestCol--;
+                }
+                if (!heuristica.validLocation(boardCopy, bestCol) && bestCol == 0) {
+                    while (!heuristica.validLocation(boardCopy, bestCol) && bestCol < COLUMN_SIZE) {
+                        bestCol++;
+                    }
+                }
+                heuristica.play(boardCopy, bestCol, color); // Simula una jugada
                 
                 int nextPlayerColor = (color == 1) ? 2 : 1; // Alterna el jugador
 
                 // Llama recursivamente a minimax
-                int score = minimax(board, depth - 1, alpha, beta, !maximizingPlayer, nextPlayerColor)[1];
+                int score = minimax(boardCopy, depth - 1, alpha, beta, !maximizingPlayer, nextPlayerColor)[1];
                 
                 // Actualiza la mejor puntuación y columna para el jugador maximizador
                 if (maximizingPlayer) {
