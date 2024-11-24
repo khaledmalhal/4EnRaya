@@ -17,10 +17,11 @@ public class MinMaxBot implements IAuto, Jugador {
     private Heuristica heuristica; // Instancia de la clase Heuristica para evaluar posiciones en el tablero
     private int maxDepth; // Profundidad máxima de la búsqueda Minimax
     private int COLUMN_SIZE;  // Tamaño de la columna de la tabla
+    private int jugadas;
 
     /**
      * Constructor de MinMaxBot.
-     * 
+     *
      * @param size Tamaño del tablero.
      * @param depth Profundidad máxima de la búsqueda Minimax.
      */
@@ -32,7 +33,7 @@ public class MinMaxBot implements IAuto, Jugador {
 
     /**
      * Método privado para establecer la profundidad máxima.
-     * 
+     *
      * @param maxDepth Profundidad máxima a establecer.
      */
     private void setMaxDepth(int maxDepth) {
@@ -41,24 +42,24 @@ public class MinMaxBot implements IAuto, Jugador {
 
     /**
      * Calcula el movimiento óptimo utilizando el algoritmo Minimax con poda alfa-beta.
-     * 
+     *
      * @param t Tablero actual.
      * @param color Color del jugador actual (1 o 2).
      * @return Columna óptima para realizar el movimiento.
      */
     @Override
     public int moviment(Tauler t, int color) {
+        // Inicializa la cantidad de jugadas exploradas a 0.
+        jugadas = 0;
         // Llama a minimax para determinar el mejor movimiento
-        // System.out.println("Running MinMax first time");
-        // heuristica.printTable(convertToBoardArray(t));
         int bestMove = minimax(convertToBoardArray(t), maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true, color)[0];
-        // System.out.printf("Best move: %d\n", bestMove);
+        System.out.printf("## Jugadas exploradas: %d\n", jugadas);
         return bestMove; // Devuelve la mejor columna
     }
 
     /**
      * Devuelve el nombre del jugador.
-     * 
+     *
      * @return Nombre del jugador ("MinMaxBot").
      */
     @Override
@@ -68,7 +69,7 @@ public class MinMaxBot implements IAuto, Jugador {
 
     /**
      * Implementación del algoritmo Minimax con poda alfa-beta.
-     * 
+     *
      * @param t Tablero actual.
      * @param depth Profundidad restante de la búsqueda.
      * @param alpha Valor alfa para la poda.
@@ -79,7 +80,6 @@ public class MinMaxBot implements IAuto, Jugador {
      */
     private int[] minimax(int[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, int color) {
         // Caso base: si se alcanza la profundidad máxima o no hay movimientos posibles
-        // heuristica.printTable(board);
         boolean finished = heuristica.finished(board);
         if (depth == 0 || finished) {
             if (finished) {
@@ -94,7 +94,6 @@ public class MinMaxBot implements IAuto, Jugador {
                 else return new int[] { 0, 0 };
             }
             int score = heuristica.scorePosition(board, heuristica.PLAYER_PIECE); // Evalúa el tablero
-            // System.out.printf("Got score with depth 0: %d\n", score);
             return new int[] { 0, score }; // Devuelve la puntuación sin movimiento
         }
 
@@ -105,14 +104,15 @@ public class MinMaxBot implements IAuto, Jugador {
         // Itera por todas las columnas posibles
         for (int col: colList) {
             if (heuristica.validLocation(board, col)) { // Verifica si el movimiento en la columna es válido
-                
+
                 int[][] boardCopy = new int[COLUMN_SIZE][COLUMN_SIZE]; // Crea una copia del tablero
                 for (int i = 0; i < COLUMN_SIZE; ++i){
                     System.arraycopy(board[i], 0, boardCopy[i], 0, COLUMN_SIZE);
                 }
 
-                heuristica.play(boardCopy, col, color); // Simula una jugada
-                
+                heuristica.play(boardCopy, col, color); // Simula una jugada en la tabla copia
+                ++jugadas;
+
                 int nextPlayerColor = (color == heuristica.PLAYER_PIECE) ? // Alterna el jugador
                                        heuristica.BOT_PIECE : heuristica.PLAYER_PIECE;
 
@@ -142,15 +142,13 @@ public class MinMaxBot implements IAuto, Jugador {
                 }
             }
         }
-        // System.out.printf("bestScore: %d\n", bestScore);
-        // heuristica.printTable(board);
 
         return new int[] { bestColumn, bestScore }; // Devuelve la mejor columna y puntuación
     }
 
     /**
      * Convierte un objeto Tauler en una matriz bidimensional para la evaluación de la heurística.
-     * 
+     *
      * @param t Tablero actual.
      * @return Matriz bidimensional representando el tablero.
      */

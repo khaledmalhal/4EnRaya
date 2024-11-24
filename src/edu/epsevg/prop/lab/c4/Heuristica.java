@@ -272,11 +272,22 @@ public class Heuristica {
         return playerWin || botWin || possibleCol.isEmpty();
     }
 
+    /**
+     * Imprime la tabla en consola como un array 2x2. Solo es útil para realizar debugging.
+     *
+     * Nota: La tabla impresa está girada 90º.
+     * @param board La tabla a imprimir.
+     */
     public void printTable(int[][] board) {
         System.out.println("\n  0  1  2  3  4  5  6  7");
-        for (int c = 0; c < COLUMN_COUNT; ++c) {
-            for (int r = 0; r < ROW_COUNT; ++r) {
-                System.out.printf("  %d", board[r][c]);
+        for (int r = 0; r < ROW_COUNT; ++r) {
+            for (int c = 0; c < COLUMN_COUNT; ++c) {
+                if (c < board[r].length) {
+                    int color = board[c][r];
+                    if (color == PLAYER_PIECE || color == EMPTY)
+                        System.out.printf(" ");
+                    System.out.printf(" %d", color);
+                }
             }
             System.out.printf("\n");
         }
