@@ -391,12 +391,12 @@ public class Juga2 extends javax.swing.JFrame {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (t.getColor(j, i) == 1) {
-                    g.setColor(Color.RED);                    
+                    g.setColor(Color.RED);
                     g.fillOval(whichx(i), whichy(j), size, size);
                     g.setColor(Color.BLACK);
                     g.drawOval(whichx(i), whichy(j), size, size);
                 } else if (t.getColor(j, i) == -1) {
-                    g.setColor(Color.BLUE);                    
+                    g.setColor(Color.BLUE);
                     g.fillOval(whichx(i), whichy(j), size, size);
                     g.setColor(Color.BLACK);
                     g.drawOval(whichx(i), whichy(j), size, size);

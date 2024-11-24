@@ -4,6 +4,8 @@
  */
 package edu.epsevg.prop.lab.c4;
 
+import java.util.ArrayList;
+
 /**
  * Clase MinMaxBot que implementa un jugador automático utilizando el algoritmo Minimax 
  * con poda alfa-beta y una heurística personalizada para evaluar las posiciones en el tablero.
@@ -74,27 +76,31 @@ public class MinMaxBot implements IAuto, Jugador {
      */
     private int[] minimax(int[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, int color) {
         // Caso base: si se alcanza la profundidad máxima o no hay movimientos posibles
+        // heuristica.printTable(board);
         boolean finished = heuristica.finished(board);
         if (depth == 0 || finished) {
             if (finished) {
                 if (heuristica.winningMove(board, heuristica.PLAYER_PIECE)) {
-                    return new int[] { -1 , Integer.MIN_VALUE };
+                    System.out.println("Player has winning move");
+                    return new int[] { 0 , Integer.MIN_VALUE };
                 }
                 else if (heuristica.winningMove(board, heuristica.BOT_PIECE)) {
-                    return new int[] { -1 , Integer.MAX_VALUE };
+                    System.out.println("Bot has winning move");
+                    return new int[] { 0 , Integer.MAX_VALUE };
                 }
-                else return new int[] { -1, 0 };
+                else return new int[] { 0, 0 };
             }
             int score = heuristica.scorePosition(board, heuristica.BOT_PIECE); // Evalúa el tablero
             // System.out.printf("Got score with depth 0: %d\n", score);
-            return new int[] { -1, score }; // Devuelve la puntuación sin movimiento
+            return new int[] { 0, score }; // Devuelve la puntuación sin movimiento
         }
 
-        int bestColumn = -1; // Inicializa la mejor columna
+        ArrayList<Integer> colList = heuristica.getValidPlays(board);
+        System.out.println(colList);
+        int bestColumn = colList.get((int)Math.floor(Math.random()*colList.size())); // Inicializa la mejor columna
         int bestScore = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE; // Inicializa la mejor puntuación
-
         // Itera por todas las columnas posibles
-        for (int col = 0; col < COLUMN_SIZE; col++) {
+        for (int col: colList) {
             if (heuristica.validLocation(board, col)) { // Verifica si el movimiento en la columna es válido
                 
                 int[][] boardCopy = new int[COLUMN_SIZE][COLUMN_SIZE]; // Crea una copia del tablero
@@ -102,18 +108,10 @@ public class MinMaxBot implements IAuto, Jugador {
                     System.arraycopy(board[i], 0, boardCopy[i], 0, COLUMN_SIZE);
                 }
 
-                int bestCol = ((COLUMN_SIZE - col) / 2) - 1;
-                while (!heuristica.validLocation(boardCopy, bestCol) && bestCol != 0) {
-                    bestCol--;
-                }
-                if (!heuristica.validLocation(boardCopy, bestCol) && bestCol == 0) {
-                    while (!heuristica.validLocation(boardCopy, bestCol) && bestCol < COLUMN_SIZE) {
-                        bestCol++;
-                    }
-                }
-                heuristica.play(boardCopy, bestCol, color); // Simula una jugada
+                heuristica.play(boardCopy, col, color); // Simula una jugada
                 
-                int nextPlayerColor = (color == 1) ? 2 : 1; // Alterna el jugador
+                int nextPlayerColor = (color == heuristica.PLAYER_PIECE) ? // Alterna el jugador
+                                       heuristica.BOT_PIECE : heuristica.PLAYER_PIECE;
 
                 // Llama recursivamente a minimax
                 int score = minimax(boardCopy, depth - 1, alpha, beta, !maximizingPlayer, nextPlayerColor)[1];
@@ -142,6 +140,7 @@ public class MinMaxBot implements IAuto, Jugador {
             }
         }
         // System.out.printf("bestScore: %d\n", bestScore);
+        // heuristica.printTable(board);
 
         return new int[] { bestColumn, bestScore }; // Devuelve la mejor columna y puntuación
     }
@@ -161,7 +160,6 @@ public class MinMaxBot implements IAuto, Jugador {
                 board[r][c] = t.getColor(r, c); // Obtiene el color de cada posición
             }
         }
-
         return board; // Devuelve la matriz convertida
     }
 }

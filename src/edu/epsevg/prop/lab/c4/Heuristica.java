@@ -13,7 +13,7 @@ public class Heuristica {
     private static int COLUMN_COUNT; // Número de columnas del tablero
     final int WINDOW_LENGTH = 4; // Longitud de la ventana (4 fichas en línea)
     final int PLAYER_PIECE = 1; // Representación del jugador
-    final int BOT_PIECE = 2; // Representación del bot
+    final int BOT_PIECE = -1; // Representación del bot
     final int EMPTY = 0; // Representación de un espacio vacío
 
     /**
@@ -178,8 +178,10 @@ public class Heuristica {
         // Verifica filas para jugadas ganadoras
         for (int c = 0; c < COLUMN_COUNT - 3; c++) {
             for (int r = 0; r < ROW_COUNT; r++) {
-                if (board[r][c] == piece && board[r][c + 1] == piece &&
+                if (board[r][c]     == piece && board[r][c + 1] == piece &&
                     board[r][c + 2] == piece && board[r][c + 3] == piece) {
+                        // System.out.printf("[-]%s has the winning move\n",
+                        // (piece == 1) ? "MinMaxBot" : "Profe");
                     return true;
                 }
             }
@@ -188,8 +190,10 @@ public class Heuristica {
         // Verifica columnas para jugadas ganadoras
         for (int c = 0; c < COLUMN_COUNT; c++) {
             for (int r = 0; r < ROW_COUNT - 3; r++) {
-                if (board[r][c] == piece && board[r + 1][c] == piece &&
+                if (board[r][c]     == piece && board[r + 1][c] == piece &&
                     board[r + 2][c] == piece && board[r + 3][c] == piece) {
+                        // System.out.printf("[|]%s has the winning move\n",
+                        // (piece == 1) ? "MinMaxBot" : "Profe");
                     return true;
                 }
             }
@@ -198,8 +202,10 @@ public class Heuristica {
         // Verifica diagonales positivas (\)
         for (int c = 0; c < COLUMN_COUNT - 3; c++) {
             for (int r = 0; r < ROW_COUNT - 3; r++) {
-                if (board[r][c] == piece && board[r + 1][c + 1] == piece &&
+                if (board[r][c]         == piece && board[r + 1][c + 1] == piece &&
                     board[r + 2][c + 2] == piece && board[r + 3][c + 3] == piece) {
+                        // System.out.printf("[\\]%s has the winning move\n",
+                        // (piece == 1) ? "MinMaxBot" : "Profe");
                     return true;
                 }
             }
@@ -208,8 +214,10 @@ public class Heuristica {
         // Verifica diagonales negativas (/)
         for (int c = 0; c < COLUMN_COUNT - 3; c++) {
             for (int r = 3; r < ROW_COUNT; r++) {
-                if (board[r][c] == piece && board[r - 1][c + 1] == piece &&
+                if (board[r][c]         == piece && board[r - 1][c + 1] == piece &&
                     board[r - 2][c + 2] == piece && board[r - 3][c + 3] == piece) {
+                        // System.out.printf("[/]%s has the winning move\n",
+                        // (piece == 1) ? "MinMaxBot" : "Profe");
                     return true;
                 }
             }
@@ -232,13 +240,13 @@ public class Heuristica {
             ++row;
         if (row < ROW_COUNT)
             board[row][col] = color;
-        System.out.printf("Playing in board[%d][%d]\n", row, col);
+        // System.out.printf("Playing in board[%d][%d]\n", row, col);
     }
 
     /**
      * Cuenta cuántas veces aparece un valor en una ventana.
      *
-     * @param window Arreglo que representa la ventana a analizar.
+     * @param window Array que representa la ventana a analizar.
      * @param value Valor a contar en la ventana.
      * @return Cantidad de ocurrencias del valor.
      */
@@ -259,8 +267,18 @@ public class Heuristica {
      */
     public boolean finished(int[][] board) {
         boolean playerWin = winningMove(board, PLAYER_PIECE);
-        boolean botWin = winningMove(board, BOT_PIECE);
+        boolean botWin    = winningMove(board, BOT_PIECE);
         ArrayList<Integer> possibleCol = getValidPlays(board);
         return playerWin || botWin || possibleCol.isEmpty();
+    }
+
+    public void printTable(int[][] board) {
+        System.out.println("\n  0  1  2  3  4  5  6  7");
+        for (int c = 0; c < COLUMN_COUNT; ++c) {
+            for (int r = 0; r < ROW_COUNT; ++r) {
+                System.out.printf("  %d", board[r][c]);
+            }
+            System.out.printf("\n");
+        }
     }
 }
