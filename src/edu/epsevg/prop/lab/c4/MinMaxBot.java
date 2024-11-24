@@ -49,7 +49,10 @@ public class MinMaxBot implements IAuto, Jugador {
     @Override
     public int moviment(Tauler t, int color) {
         // Llama a minimax para determinar el mejor movimiento
+        // System.out.println("Running MinMax first time");
+        // heuristica.printTable(convertToBoardArray(t));
         int bestMove = minimax(convertToBoardArray(t), maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true, color)[0];
+        // System.out.printf("Best move: %d\n", bestMove);
         return bestMove; // Devuelve la mejor columna
     }
 
@@ -81,22 +84,22 @@ public class MinMaxBot implements IAuto, Jugador {
         if (depth == 0 || finished) {
             if (finished) {
                 if (heuristica.winningMove(board, heuristica.PLAYER_PIECE)) {
-                    System.out.println("Player has winning move");
-                    return new int[] { 0 , Integer.MIN_VALUE };
+                    // System.out.println("Player has winning move");
+                    return new int[] { 0 , Integer.MAX_VALUE };
                 }
                 else if (heuristica.winningMove(board, heuristica.BOT_PIECE)) {
-                    System.out.println("Bot has winning move");
-                    return new int[] { 0 , Integer.MAX_VALUE };
+                    // System.out.println("Bot has winning move");
+                    return new int[] { 0 , Integer.MIN_VALUE };
                 }
                 else return new int[] { 0, 0 };
             }
-            int score = heuristica.scorePosition(board, heuristica.BOT_PIECE); // Evalúa el tablero
+            int score = heuristica.scorePosition(board, heuristica.PLAYER_PIECE); // Evalúa el tablero
             // System.out.printf("Got score with depth 0: %d\n", score);
             return new int[] { 0, score }; // Devuelve la puntuación sin movimiento
         }
 
         ArrayList<Integer> colList = heuristica.getValidPlays(board);
-        System.out.println(colList);
+
         int bestColumn = colList.get((int)Math.floor(Math.random()*colList.size())); // Inicializa la mejor columna
         int bestScore = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE; // Inicializa la mejor puntuación
         // Itera por todas las columnas posibles
