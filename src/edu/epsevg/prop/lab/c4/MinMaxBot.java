@@ -23,7 +23,7 @@ public class MinMaxBot implements IAuto, Jugador {
      * Constructor de MinMaxBot.
      *
      * @param size Tamaño del tablero.
-     * @param depth Profundidad máxima de la búsqueda Minimax.
+     * @param depth Profundidad máxima de la búsqueda Minmax.
      */
     public MinMaxBot(int size, int depth) {
         this.COLUMN_SIZE = size;
@@ -32,19 +32,19 @@ public class MinMaxBot implements IAuto, Jugador {
     }
 
     /**
-     * Método privado para establecer la profundidad máxima.
+     * Método para establecer la profundidad máxima de recorrido Minmax.
      *
      * @param maxDepth Profundidad máxima a establecer.
      */
-    private void setMaxDepth(int maxDepth) {
+    public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
     }
 
     /**
-     * Calcula el movimiento óptimo utilizando el algoritmo Minimax con poda alfa-beta.
+     * Calcula el movimiento óptimo utilizando el algoritmo Minmax con poda alfa-beta.
      *
      * @param t Tablero actual.
-     * @param color Color del jugador actual (1 o 2).
+     * @param color Color del jugador actual.
      * @return Columna óptima para realizar el movimiento.
      */
     @Override
@@ -70,15 +70,15 @@ public class MinMaxBot implements IAuto, Jugador {
     /**
      * Implementación del algoritmo Minimax con poda alfa-beta.
      *
-     * @param t Tablero actual.
+     * @param board Tablero actual.
      * @param depth Profundidad restante de la búsqueda.
      * @param alpha Valor alfa para la poda.
      * @param beta Valor beta para la poda.
      * @param maximizingPlayer Indicador de si es el turno del jugador maximizador.
      * @param color Color del jugador actual.
-     * @return Arreglo con la columna óptima y la puntuación asociada.
+     * @return Array con la columna óptima y la puntuación asociada, respectivamente.
      */
-    private int[] minimax(int[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, int color) {
+    public int[] minimax(int[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, int color) {
         // Caso base: si se alcanza la profundidad máxima o no hay movimientos posibles
         boolean finished = heuristica.finished(board);
         if (depth == 0 || finished) {
@@ -152,7 +152,7 @@ public class MinMaxBot implements IAuto, Jugador {
      * @param t Tablero actual.
      * @return Matriz bidimensional representando el tablero.
      */
-    private int[][] convertToBoardArray(Tauler t) {
+    public int[][] convertToBoardArray(Tauler t) {
         int[][] board = new int[t.getMida()][t.getMida()]; // Inicializa la matriz del tamaño del tablero
 
         // Rellena la matriz con los valores del tablero

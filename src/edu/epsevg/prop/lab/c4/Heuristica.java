@@ -74,7 +74,7 @@ public class Heuristica {
      * Calcula la puntuación de una posición en el tablero en función de una heurística.
      *
      * @param board Matriz bidimensional que representa el tablero.
-     * @param piece Pieza del jugador actual (1 para jugador, 2 para bot).
+     * @param piece Pieza del jugador actual.
      * @return Puntuación calculada para el tablero.
      */
     public int scorePosition(int[][] board, int piece) {
@@ -140,10 +140,10 @@ public class Heuristica {
      * Evalúa una ventana de 4 espacios en el tablero y asigna una puntuación.
      *
      * @param window Arreglo que representa la ventana a evaluar.
-     * @param piece Pieza del jugador actual (1 para jugador, 2 para bot).
+     * @param piece Pieza del jugador actual.
      * @return Puntuación de la ventana.
      */
-    private int evaluateWindow(int[] window, int piece) {
+    public int evaluateWindow(int[] window, int piece) {
         int score = 0; // Inicializa la puntuación para la ventana
         int oppPiece = (piece == PLAYER_PIECE) ? BOT_PIECE : PLAYER_PIECE; // Define la pieza del oponente
 
@@ -171,7 +171,7 @@ public class Heuristica {
      * Verifica si un jugador tiene una jugada ganadora en el tablero.
      *
      * @param board Matriz bidimensional que representa el tablero.
-     * @param piece Pieza del jugador actual (1 para jugador, 2 para bot).
+     * @param piece Pieza del jugador actual.
      * @return true si el jugador tiene una jugada ganadora, de lo contrario false.
      */
     public boolean winningMove(int[][] board, int piece) {
@@ -250,7 +250,7 @@ public class Heuristica {
      * @param value Valor a contar en la ventana.
      * @return Cantidad de ocurrencias del valor.
      */
-    private static int count(int[] window, int value) {
+    public static int count(int[] window, int value) {
         int count = 0;
         for (int i : window) {
             if (i == value) count++;
